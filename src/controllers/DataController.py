@@ -7,10 +7,9 @@ import re, os
 
 class DataController(BaseController):
     
-    
     def __init__(self):
         super().__init__()
-        self.size_scale = 1048576 # convert MB to bytes 
+        self.size_scale = 1048576  # convert MB to bytes 
 
     def validate_uploaded_file(self, file: UploadFile):
 
@@ -21,16 +20,37 @@ class DataController(BaseController):
             return False, ResponseSignal.FILE_SIZE_EXCEEDED.value
     
         return True, ResponseSignal.FILE_VALIDATED_SUCCESS.value
-    
-    
-    
-    def generate_unique_filepath(self, orig_file_name: str, project_id: str):
-        random_key = self.generate_random_string()
-        project_path = ProjectController().get_project_path(project_id=project_id)
 
-        cleaned_file_name = self.get_clean_file_name(
-            orig_file_name=orig_file_name
+
+    def validate_project_size(self, project_id: str, user_id: str, new_file_size: int):
+        project_path = ProjectController().get_project_path(
+            project_id=project_id,
+            user_id=user_id
         )
+
+       
+        current_size = 0
+        if os.path.exists(project_path):
+            for file in os.listdir(project_path):
+                file_path = os.path.join(project_path, file)
+                if os.path.isfile(file_path):
+                    current_size += os.path.getsize(file_path)
+
+        # تحقق إذا الحجم الجديد سيتجاوز الحد
+        if (current_size + new_file_size) > self.app_settings.PROJECT_MAX_SIZE * self.size_scale:
+            return False, ResponseSignal.PROJECT_SIZE_EXCEEDED.value
+
+        return True, ResponseSignal.FILE_VALIDATED_SUCCESS.value
+
+
+    def generate_unique_filepath(self, orig_file_name: str, project_id: str, user_id: str):
+        random_key = self.generate_random_string()
+        project_path = ProjectController().get_project_path(
+            project_id=project_id,
+            user_id=user_id
+        )
+
+        cleaned_file_name = self.get_clean_file_name(orig_file_name=orig_file_name)
 
         new_file_path = os.path.join(
             project_path,
@@ -45,11 +65,9 @@ class DataController(BaseController):
             )
 
         return new_file_path, random_key + "_" + cleaned_file_name
-    
 
 
     def get_clean_file_name(self, orig_file_name: str):
-        cleaned_file_name = re.sub(r'[^\w.]', '', orig_file_name.strip() )
+        cleaned_file_name = re.sub(r'[^\w.]', '', orig_file_name.strip())
         cleaned_file_name = cleaned_file_name.replace(" ", "_")
-
-        return cleaned_file_name 
+        return cleaned_file_name

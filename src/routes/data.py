@@ -15,28 +15,39 @@ data_router = APIRouter(
     tags=["api_v1", "data"],
 )
 
-@data_router.post("/upload/{project_id}")
 
-async def upload_data(project_id: str, file:UploadFile, app_settings: Settings = Depends(get_settings)):
+@data_router.post("/upload/{user_id}/{project_id}")
+async def upload_data(user_id: str, project_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
 
-    # validate the file properties
     data_controller = DataController()
     is_valid, result_signal = data_controller.validate_uploaded_file(file=file)
 
     if not is_valid:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "signal": result_signal
-            }
+            content={"signal": result_signal}
         )
 
+    is_size_valid, size_signal = data_controller.validate_project_size(
+        project_id=project_id,
+        user_id=user_id,
+        new_file_size=file.size
+    )
+    if not is_size_valid:
+         return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"signal": size_signal}
+        )
 
-
-    project_dir_path = ProjectController().get_project_path(project_id=project_id)
+    project_dir_path = ProjectController().get_project_path(
+        project_id=project_id,
+        user_id=user_id        
+    )
+    
     file_path, file_id = data_controller.generate_unique_filepath(
-         orig_file_name=file.filename,
-         project_id=project_id
+        orig_file_name=file.filename,
+        project_id=project_id,
+        user_id=user_id        
     )
 
     try:
@@ -64,31 +75,37 @@ async def upload_data(project_id: str, file:UploadFile, app_settings: Settings =
     )
 
 
-@data_router.post("/process/{project_id}")
-async def process_endpoint(project_id: str, process_request:ProcessRequest):
-     
-     file_id = process_request.file_id
-     chunk_size = process_request.chunk_size
-     overlap_size = process_request.overlap_size
-    
 
-     process_controller = ProcessController(project_id=project_id)
-     
-     file_content = process_controller.get_file_content(file_id=file_id)
+@data_router.post("/process/{user_id}/{project_id}")
+async def process_endpoint(user_id: str, project_id: str, process_request: ProcessRequest):
 
-     file_chunks = process_controller.process_file_content(
-          file_content=file_content,
-          file_id=file_id,
-          chunk_size=chunk_size,
-          overlap_size=overlap_size
-     )
+    chunk_size = process_request.chunk_size
+    overlap_size = process_request.overlap_size
 
-     if file_chunks is None or len(file_chunks) == 0 :
-          return JSONResponse(
-               status_code=status.HTTP_400_BAD_REQUEST,
-               content={
-                    "signal": ResponseSignal.PROCESSING_FAILED.value
-               }               
-          )
-    
-     return file_chunks
+    process_controller = ProcessController(project_id=project_id, user_id=user_id)
+
+    file_chunks = process_controller.process_all_files(
+        chunk_size=chunk_size,
+        overlap_size=overlap_size
+    )
+
+    if file_chunks is None or len(file_chunks) == 0:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"signal": ResponseSignal.PROCESSING_FAILED.value}
+        )
+
+    return JSONResponse(
+    status_code=status.HTTP_200_OK,
+    content={
+        "signal": ResponseSignal.PROCESSING_SUCCESS.value,
+        "chunks_count": len(file_chunks),
+        "chunks": [
+            {
+                "content": chunk.page_content,
+                "metadata": chunk.metadata
+            }
+            for chunk in file_chunks
+        ]
+    }
+)
