@@ -19,6 +19,7 @@ class ResponseSignal(Enum):
     FILE_NOT_FOUND = "file_not_found"
     FILE_DELETED_SUCCESS = "file_deleted_success"
     FILE_DELETE_FAILED = "file_delete_failed"
+    FILE_DO_NOT_HAVE_NAME = "file_name_is_too_short"
 
     PROCESSING_SUCCESS = "processing_success"
     PROCESSING_FAILED = "processing_failed"

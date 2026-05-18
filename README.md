@@ -39,3 +39,12 @@ cp .env.example .env
 ```
 uvicorn main:app --reload
 ```
+## Run Docker Compose Sevices
+
+``` bash
+$ cd docker
+$ cp .env.example .env
+```
+
+~ update `.env` with your credentials
+

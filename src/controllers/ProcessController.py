@@ -8,19 +8,18 @@ from models import ProcessingEnum
 
 
 class ProcessController(BaseController):
-    def __init__(self, project_id: str, user_id: str):  # أضف user_id
+    def __init__(self, project_id: str):  # أضف user_id
         super().__init__()
 
         self.project_id = project_id
         self.project_path = ProjectController().get_project_path(
             project_id=project_id,
-            user_id=user_id  # أضف user_id
         )
 
-    def get_all_project_files(self):
-        if not os.path.exists(self.project_path):
-            return []        
-        return os.listdir(self.project_path)
+    # def get_all_project_files(self):
+    #     if not os.path.exists(self.project_path):
+    #         return []        
+    #     return os.listdir(self.project_path)
 
 
     def get_file_extension(self, file_id: str):
@@ -42,8 +41,18 @@ class ProcessController(BaseController):
         return None
 
     def get_file_content(self, file_id: str):
+        file_path = os.path.join(self.project_path, file_id)
+    
+        if not os.path.exists(file_path):
+            return None
+            
         loader = self.get_file_loader(file_id=file_id)
-        return loader.load()
+        if loader is None:
+            return None
+        try:
+            return loader.load()
+        except Exception as e:
+            return None
 
     def process_file_content(self, file_content: list, file_id: str, chunk_size: int=100, overlap_size: int=20):
         
@@ -71,7 +80,7 @@ class ProcessController(BaseController):
         return chunks
     
 
-    def process_all_files(self, chunk_size: int = 100, overlap_size: int = 20):
+    # def process_all_files(self, chunk_size: int = 100, overlap_size: int = 20):
         all_chunks = []
 
         for file_id in self.get_all_project_files():

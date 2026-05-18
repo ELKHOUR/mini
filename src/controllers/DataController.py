@@ -2,7 +2,7 @@ from .BaseController import BaseController
 from fastapi import UploadFile
 from models import ResponseSignal
 from .ProjectController import ProjectController
-import re, os
+import re, os, mimetypes
 
 
 class DataController(BaseController):
@@ -12,23 +12,21 @@ class DataController(BaseController):
         self.size_scale = 1048576  # convert MB to bytes 
 
     def validate_uploaded_file(self, file: UploadFile):
-
-        if file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
+        
+        if not file.content_type or file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
             return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
         
         if file.size > self.app_settings.FILE_MAX_SIZE * self.size_scale:
             return False, ResponseSignal.FILE_SIZE_EXCEEDED.value
-    
+
         return True, ResponseSignal.FILE_VALIDATED_SUCCESS.value
 
 
-    def validate_project_size(self, project_id: str, user_id: str, new_file_size: int):
+    def validate_project_size(self, project_id: str,  new_file_size: int):
         project_path = ProjectController().get_project_path(
             project_id=project_id,
-            user_id=user_id
         )
 
-       
         current_size = 0
         if os.path.exists(project_path):
             for file in os.listdir(project_path):
@@ -36,18 +34,17 @@ class DataController(BaseController):
                 if os.path.isfile(file_path):
                     current_size += os.path.getsize(file_path)
 
-        # تحقق إذا الحجم الجديد سيتجاوز الحد
+      
         if (current_size + new_file_size) > self.app_settings.PROJECT_MAX_SIZE * self.size_scale:
             return False, ResponseSignal.PROJECT_SIZE_EXCEEDED.value
 
         return True, ResponseSignal.FILE_VALIDATED_SUCCESS.value
 
 
-    def generate_unique_filepath(self, orig_file_name: str, project_id: str, user_id: str):
+    def generate_unique_filepath(self, orig_file_name: str, project_id: str):
         random_key = self.generate_random_string()
         project_path = ProjectController().get_project_path(
-            project_id=project_id,
-            user_id=user_id
+            project_id=project_id
         )
 
         cleaned_file_name = self.get_clean_file_name(orig_file_name=orig_file_name)
