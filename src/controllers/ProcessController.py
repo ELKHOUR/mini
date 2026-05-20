@@ -16,12 +16,6 @@ class ProcessController(BaseController):
             project_id=project_id,
         )
 
-    # def get_all_project_files(self):
-    #     if not os.path.exists(self.project_path):
-    #         return []        
-    #     return os.listdir(self.project_path)
-
-
     def get_file_extension(self, file_id: str):
         return os.path.splitext(file_id)[-1]
 
@@ -31,6 +25,9 @@ class ProcessController(BaseController):
             self.project_path,
             file_id
         )
+
+        if not os.path.exists(file_path):
+            return None
    
         if file_ext == ProcessingEnum.TXT.value:
             return TextLoader(file_path, encoding="utf-8")
@@ -41,18 +38,12 @@ class ProcessController(BaseController):
         return None
 
     def get_file_content(self, file_id: str):
-        file_path = os.path.join(self.project_path, file_id)
-    
-        if not os.path.exists(file_path):
-            return None
-            
+                    
         loader = self.get_file_loader(file_id=file_id)
-        if loader is None:
-            return None
-        try:
+        if loader:
             return loader.load()
-        except Exception as e:
-            return None
+        
+        return None
 
     def process_file_content(self, file_content: list, file_id: str, chunk_size: int=100, overlap_size: int=20):
         
