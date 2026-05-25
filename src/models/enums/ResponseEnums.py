@@ -12,7 +12,7 @@ class ResponseSignal(Enum):
     FILE_UPLOAD_FAILED = "file_upload_failed"
     
     PROJECT_CREATED_SUCCESS = "project_created_success"
-    PROJECT_NOT_FOUND = "project_not_found"
+    PROJECT_NOT_FOUND_ERROR = "project_not_found"
     PROJECT_DELETED_SUCCESS = "project_deleted_success"
     PROJECT_DELETE_FAILED = "project_delete_failed"
     
@@ -26,3 +26,16 @@ class ResponseSignal(Enum):
     PROCESSING_SUCCESS = "processing_success"
     PROCESSING_FAILED = "processing_failed"
     PROJECT_SIZE_EXCEEDED = "project_size_exceeded"
+
+    INSERT_INTO_VECTORDB_ERROR = "insert_into_vectordb_error"
+    INSERT_INTO_VECTORDB_SUCCESS = "insert_into_vectordb_success"
+
+    VECTORDB_COLLECTION_RETRIEVED = "vector_collection_retrieved"
+    VECTORDB_SEARCH_ERROR = "vectordb_search_error"
+    VECTORDB_SEARCH_SUCCESS = "vectordb_search_success"
+
+    RAG_ANSWER_ERROR = "rag_answer_error"
+    RAG_ANSWER_SUCCESS = "rag_answer_success"
+
+    
+    
