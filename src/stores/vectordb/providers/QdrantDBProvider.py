@@ -76,8 +76,9 @@ class QdrantDBProvider(VectorDBInterface):
             ################### self.client.upload_records replaced with self.client.upsert
             _ = self.client.upsert(
                 collection_name=collection_name,
-                records=[
-                    models.Record(
+                points=[
+                    ########### models.Record replaced with models.PointStruct
+                    models.PointStruct(
                         id=record_id,
                         vector=vector,
                         payload={
@@ -112,8 +113,8 @@ class QdrantDBProvider(VectorDBInterface):
             batch_record_ids = record_ids[i:batch_end]
 
             batch_records = [
-                
-                models.Record(
+                ######## models.Record replaced with models.PointStruct
+                models.PointStruct(
                     id=batch_record_ids[x],
                     vector=batch_vectors[x],
                     payload={
@@ -125,9 +126,10 @@ class QdrantDBProvider(VectorDBInterface):
             ]
             
             try:
-                _ = self.client.upload_records(
+                ######## self.client.upload replaced with self.client.upsert 
+                _ = self.client.upsert(
                     collection_name=collection_name,
-                    records=batch_records,
+                    points=batch_records,
                 )
             except Exception as e:
                 self.logger.error(f"Error while inserting batch: {e}")

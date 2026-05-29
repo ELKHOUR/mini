@@ -34,3 +34,4 @@ networks:
 volumes:
   # mongodata:
   pgvector_data:
+
