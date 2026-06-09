@@ -6,8 +6,15 @@ from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 from stores.llm.templates.template_parser import TemplateParser
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from stores.llm.providers.OpenAIProvider import OpenAIProvider 
+
+# Import metrics setup
+from utils.mertics import setup_metrics
 
 app = FastAPI()
+
+# setup_metrics(app)
+
 
 @app.on_event("startup")
 async def startup_span():
@@ -25,23 +32,46 @@ async def startup_span():
     # app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
 
     llm_provider_factory = LLMProviderFactory(settings)
-    vectordb_provider_factory = VectorDBProviderFactory(settings)
+    vectordb_provider_factory = VectorDBProviderFactory(config=settings, db_client=app.db_client)
 
     #generation client
     app.generation_client = llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
     app.generation_client.set_generation_model(model_id=settings.GENERATION_MODEL_ID)
     
+
+
+
+
+
     # embedding client
     app.embedding_client = llm_provider_factory.create(provider=settings.EMBEDDING_BACKEND)
+
+    # app.embedding_client = OpenAIProvider(
+    #     api_key=settings.OLLAMA_API_KEY,
+    #     api_url=settings.OLLAMA_API_URL,
+    #     default_input_max_characters=settings.INPUT_DEFAULT_MAX_CHARACTERS,
+    #     default_generation_max_output_tokens=settings.GENERATION_DEFAULT_MAX_TOKENS,
+    #     default_generation_temperature=settings.GENERATION_DEFAULT_TEMPERATURE
+    # )
+    
     app.embedding_client.set_embedding_model(model_id=settings.EMBEDDING_MODEL_ID,
                                              embedding_size=settings.EMBEDDING_MODEL_SIZE)
+
+
+
+
+
+    
+
+
+
 
     # vector db client
     app.vectordb_client = vectordb_provider_factory.create(
         provider=settings.VECTOR_DB_BACKEND
     )
     
-    app.vectordb_client.connect()
+    await app.vectordb_client.connect()
 
     app.template_parser = TemplateParser(
         language=settings.PRIMARY_LANG,
@@ -52,7 +82,7 @@ async def startup_span():
 @app.on_event("shutdown")
 async def shutdown_span():
     app.db_engine.dispose() 
-    app.vectordb_client.disconnect() 
+    await app.vectordb_client.disconnect() 
 
 
 
