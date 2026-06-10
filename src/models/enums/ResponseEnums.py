@@ -37,5 +37,22 @@ class ResponseSignal(Enum):
     RAG_ANSWER_ERROR = "rag_answer_error"
     RAG_ANSWER_SUCCESS = "rag_answer_success"
 
+
+    EMAIL_ALREADY_EXISTS = "email_already_exists"
+    REGISTER_SUCCESS_SIGNAL =  "register_success"
+    REGISTER_SUCCESS_MESSAGE = "Please check your email to verify your account"
+    LOGIN_SUCCESS = "login_success"
+
+    INVALID_API_KEY = "invalid_api_key"
+    INVALID_TOKEN = "invalid_token"
+    MISSING_TOKEN = "missing_token"
+
+    EMAIL_VERIFIED_SUCCESS = "email_verified_success"
+    INVALID_EMAIL_OR_PASSWORD = "invalid_email_or_password"
+    EMAIL_NOT_VERIFIED = "email_not_verified"
+    
+
+
+    
     
     

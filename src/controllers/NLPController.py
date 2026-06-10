@@ -114,10 +114,12 @@ class NLPController(BaseController):
 
         if not retrieved_documents or len(retrieved_documents) == 0:
             return answer, full_prompt, chat_history
+        
+        lang = getattr(project, 'project_lang', None)
 
         # step_2: construct LLM prompt
         system_prompt = self.template_parser.get(
-            "rag", "system_prompt"
+            "rag", "system_prompt", language=lang
         )
         
         
@@ -125,14 +127,14 @@ class NLPController(BaseController):
             self.template_parser.get("rag", "document_prompt",{
                     "doc_num": idx + 1,
                     "chunk_text": self.generation_client.process_text(doc.text),
-                })
+                }, language=lang)
             for idx, doc in enumerate(retrieved_documents)
         ])
 
 
         footer_prompt = self.template_parser.get("rag", "footer_prompt", {
             "query": query
-        })
+        }, language=lang)
 
         chat_history = [
             self.generation_client.construct_prompt(

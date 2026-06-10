@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     PRIMARY_LANG: str = "en"
     DEFAULT_LANG: str = "en"
 
+    # JWT
+    SECRET_KEY: str = "changeme"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Brevo
+    BREVO_API_KEY: str = None
+    BREVO_SENDER_EMAIL: str = None
+    BREVO_SENDER_NAME: str = "Mini RAG"
+
     
 
     class Config:

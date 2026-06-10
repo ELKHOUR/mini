@@ -27,7 +27,7 @@ class ProjectModel(BaseDataModel):
         return project
     
 
-    async def get_project_or_create_one(self, project_id: str):
+    async def get_project_or_create_one(self, project_id: str, project_lang: str = "en" ):
         async with self.db_client() as session:
             async with session.begin():
                 query = select(Project).where(Project.project_id == project_id)
@@ -36,11 +36,20 @@ class ProjectModel(BaseDataModel):
                 if project is None:
                     project_rec = Project(
                         project_id = project_id,
+                        project_lang=project_lang,
                     )
                     project = await self.create_project(project=project_rec)
                     return project
                 else:
                     return project
+
+    
+    async def get_project_by_api_key(self, api_key: str):
+        async with self.db_client() as session:
+            result = await session.execute(
+                select(Project).where(Project.project_api_key == api_key)
+            )
+            return result.scalar_one_or_none()
 
     async def get_all_projects(self, page: int=1, page_size: int=10):
         async with self.db_client() as session:

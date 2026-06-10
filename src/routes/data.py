@@ -21,14 +21,18 @@ data_router = APIRouter(
 )
 
 
-@data_router.post("/upload/{project_id}")  
-async def upload_data(request: Request, project_id: int, file: UploadFile, app_settings: Settings = Depends(get_settings)):
+@data_router.post("/upload")
+async def upload_data(request: Request, file: UploadFile, app_settings: Settings = Depends(get_settings)):
+    user = request.state.user
+    async with request.app.db_client() as session:
+        from sqlalchemy.future import select
+        from models.db_schemes import Project
+        result = await session.execute(select(Project).where(Project.user_id == user.user_id))
+        project = result.scalar_one_or_none()
 
-    project_model = await ProjectModel.create_instance(
-         db_client=request.app.db_client
-    )
-    project = await project_model.get_project_or_create_one(project_id = project_id)
-
+    if not project:
+        return JSONResponse(status_code=400, content={"signal": "project_not_found"})
+    
     data_controller = DataController()
     is_valid, result_signal = data_controller.validate_uploaded_file(file=file)
 
@@ -39,8 +43,7 @@ async def upload_data(request: Request, project_id: int, file: UploadFile, app_s
         )
 
     is_size_valid, size_signal = data_controller.validate_project_size(
-        project_id=project_id,
-        # user_id=user_id,
+        project_id=project.project_id,
         new_file_size=file.size
     )
     if not is_size_valid:
@@ -52,7 +55,7 @@ async def upload_data(request: Request, project_id: int, file: UploadFile, app_s
     
     file_path, file_id = data_controller.generate_unique_filepath(
         orig_file_name=file.filename,
-        project_id=project_id,       
+        project_id=project.project_id,       
     )
 
     try:
@@ -99,18 +102,21 @@ async def upload_data(request: Request, project_id: int, file: UploadFile, app_s
 
 
 
-@data_router.post("/process/{project_id}")
-async def process_endpoint(request:Request, project_id: int, process_request: ProcessRequest):
-
+@data_router.post("/process")
+async def process_endpoint(request: Request, process_request: ProcessRequest):
+    user = request.state.user
+    async with request.app.db_client() as session:
+        from sqlalchemy.future import select
+        from models.db_schemes import Project
+        result = await session.execute(select(Project).where(Project.user_id == user.user_id))
+        project = result.scalar_one_or_none()
+    if not project:
+        return JSONResponse(status_code=400, content={"signal": "project_not_found"})
     
     chunk_size = process_request.chunk_size
     overlap_size = process_request.overlap_size
     do_reset = process_request.do_reset
 
-    project_model = await ProjectModel.create_instance(
-         db_client=request.app.db_client
-    )
-    project = await project_model.get_project_or_create_one(project_id = project_id)
 
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
@@ -161,7 +167,7 @@ async def process_endpoint(request:Request, project_id: int, process_request: Pr
             }
         )
 
-    process_controller = ProcessController(project_id=project_id)
+    process_controller = ProcessController(project_id=project.project_id)
 
     on_records = 0
     on_files = 0
