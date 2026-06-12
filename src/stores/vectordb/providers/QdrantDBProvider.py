@@ -50,7 +50,7 @@ class QdrantDBProvider(VectorDBInterface):
                         embedding_size: int,
                         do_reset: bool = False):
         if do_reset:
-            _ = self.delete_collection(collection_name=collection_name)
+            _ = await self.delete_collection(collection_name=collection_name)
         
         if not self.is_collection_existed(collection_name):
             self.logger.info(f"Creating new Qdrant collection: {collection_name}")
@@ -160,3 +160,12 @@ class QdrantDBProvider(VectorDBInterface):
             })
             for result in results
         ]
+    
+    async def delete_by_ids(self, collection_name: str, ids: list):
+        if not await self.is_collection_existed(collection_name):
+            return False
+        await self.client.delete(
+            collection_name=collection_name,
+            points_selector=models.PointIdsList(points=ids)
+        )
+        return True

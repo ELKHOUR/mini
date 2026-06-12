@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import base, data, nlp, auth  
+from routes import base, data, nlp, auth, project  
 from helpers.config import get_settings
 from stores.llm.LLMProviderFactory import LLMProviderFactory
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
@@ -9,14 +9,20 @@ from sqlalchemy.orm import sessionmaker
 from stores.llm.providers.OpenAIProvider import OpenAIProvider 
 from middleware.auth import auth_middleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import metrics setup
 from utils.mertics import setup_metrics
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
-# setup_metrics(app)
 
 
 @app.on_event("startup")
@@ -96,16 +102,11 @@ async def shutdown_span():
 app.include_router(base.base_router)
 app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
-app.include_router(auth.auth_router) 
+app.include_router(auth.auth_router)
+app.include_router(project.project_router) 
 
 
 
-from fastapi.middleware.cors import CORSMiddleware
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+

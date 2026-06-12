@@ -60,7 +60,7 @@ class AuthController:
 
     def send_verification_email(self, email: str, name: str, token: str) -> bool:
         try:
-            verification_link = f"http://localhost:8000/api/v1/auth/verify/{token}"
+            verification_link = f"http://localhost:5173/verify/{token}"
             
             response = httpx.post(
                 "https://api.brevo.com/v3/smtp/email",

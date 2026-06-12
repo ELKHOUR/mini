@@ -275,7 +275,17 @@ class PGVectorProvider(VectorDBInterface):
                     for record in records
                 ]
 
-
+    async def delete_by_ids(self, collection_name: str, ids: list):
+        is_existed = await self.is_collection_existed(collection_name=collection_name)
+        if not is_existed:
+            return False
+        async with self.db_client() as session:
+            async with session.begin():
+                await session.execute(
+                    sql_text(f"DELETE FROM {collection_name} WHERE chunk_id = ANY(:ids)"),
+                    {"ids": ids}
+                )
+        return True
 
         
 
