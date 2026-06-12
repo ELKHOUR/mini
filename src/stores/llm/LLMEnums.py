@@ -4,6 +4,7 @@ class LLMEnums(Enum):
     
     OPENAI = "OPENAI"
     COHERE = "COHERE"
+    DEEPSEEK = "DEEPSEEK"
     
 class OpenAIEnums(Enum):
     SYSTEM = "system"
@@ -18,6 +19,11 @@ class CoHereEnums(Enum):
 
     DOCUMENT = "search_document"
     QUERY = "search_query"
+
+class DeepSeekEnums(Enum):
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "assistant"
 
 
 class DocumentTypeEnum(Enum):

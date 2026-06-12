@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     OLLAMA_API_KEY : str = None
     OLLAMA_API_URL : str = None
 
+    DEEPSEEK_API_KEY: str = None
+
     GENERATION_MODEL_ID_LITERAL : List[str] = None
     GENERATION_MODEL_ID : str = None
     EMBEDDING_MODEL_ID : str = None

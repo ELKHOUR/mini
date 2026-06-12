@@ -173,11 +173,13 @@ async def delete_file(request: Request, asset_id: int):
         collection_name = nlp_controller.create_collection_name(
             project_id=project.project_id
         )
+        logger.info(f"Deleting vectors from collection: {collection_name}, chunk_ids: {chunk_ids}")
         try:
             await request.app.vectordb_client.delete_by_ids(
                 collection_name=collection_name,
                 ids=chunk_ids
             )
+            logger.info(f"Vectors deleted successfully")
         except Exception as e:
             logger.error(f"Could not delete vectors: {e}")
 

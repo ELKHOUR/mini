@@ -86,10 +86,9 @@ export default function Sidebar({ activeSection, setActiveSection, projectName, 
 
       {/* User */}
       <div className="px-5 py-4 border-t border-gray-100">
-        <p className="text-xs text-gray-500 truncate mb-2">{userName}</p>
         <button
           onClick={onLogout}
-          className="text-xs text-gray-400 hover:text-gray-700 transition"
+          className="text-xs text-red-400 hover:text-gray-700 transition"
         >
           Sign out
         </button>

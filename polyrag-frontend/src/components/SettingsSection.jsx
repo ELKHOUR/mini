@@ -12,7 +12,8 @@ const LANGUAGES = [
 
 export default function SettingsSection() {
   const dispatch = useDispatch()
-  const { projectName, projectLang } = useSelector((state) => state.project)
+  const project = useSelector((state) => state.project)
+  const { projectName, projectLang } = project
   const [form, setForm] = useState({
     project_name: projectName || '',
     project_lang: projectLang || 'en',
@@ -33,9 +34,14 @@ export default function SettingsSection() {
     try {
       const res = await updateProject(form)
       dispatch(setProject({
-        ...useSelector,
+        project_id: project.projectId,
         project_name: res.data.project_name,
         project_lang: res.data.project_lang,
+        api_key: project.apiKey,
+        created_at: project.createdAt,
+        updated_at: project.updatedAt,
+        user_name: project.userName,
+        user_email: project.userEmail,
       }))
       setSuccess(true)
     } catch (err) {

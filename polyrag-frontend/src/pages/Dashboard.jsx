@@ -72,27 +72,23 @@ export default function Dashboard() {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
 
         {/* Top bar */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 capitalize">
-              {activeSection === 'apikeys' ? 'API Keys' :
-               activeSection === 'integration' ? 'Integration' :
-               activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
-            </h2>
-            <p className="text-xs text-gray-400 mt-0.5">{project.projectName}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">{project.userEmail}</span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-gray-900 transition"
-            >
-              Sign out
-            </button>
-          </div>
+        <div className="bg-white border-b border-gray-200 px-8 py-5.5 flex items-center justify-between flex-shrink-0">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {activeSection === 'apikeys' ? 'API Keys' :
+                activeSection === 'integration' ? 'Integration' :
+                activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+              </h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 capitalize">
+                {project.userName}
+              </span>
+          
+            </div>
         </div>
 
         {/* Section content */}

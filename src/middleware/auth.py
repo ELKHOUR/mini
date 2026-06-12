@@ -24,6 +24,10 @@ NO_PROJECT_ROUTES = [
 
 async def auth_middleware(request: Request, call_next):
 
+    # Allow CORS preflight
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
     # 1. Public routes — no token needed
     if request.url.path in PUBLIC_ROUTES or request.url.path.startswith("/api/v1/auth/verify"):
         return await call_next(request)

@@ -1,12 +1,10 @@
-import axios from 'axios'
-
-const API = 'http://localhost:8000/api/v1'
+import axiosInstance from './axiosInstance'
 
 export const register = (data) =>
-  axios.post(`${API}/auth/register`, data)
+  axiosInstance.post('/auth/register', data)
 
 export const login = (data) =>
-  axios.post(`${API}/auth/login`, data)
+  axiosInstance.post('/auth/login', data)
 
 export const verifyEmail = (token) =>
-  axios.get(`${API}/auth/verify/${token}`)
+  axiosInstance.get(`/auth/verify/${token}`)

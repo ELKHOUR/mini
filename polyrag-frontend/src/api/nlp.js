@@ -1,11 +1,9 @@
-import axios from 'axios'
+import axiosInstance from './axiosInstance'
 import { getToken } from '../utils/token'
-
-const API = 'http://localhost:8000/api/v1'
 
 const authHeaders = () => ({
   headers: { Authorization: `Bearer ${getToken()}` }
 })
 
 export const indexPush = (data) =>
-  axios.post(`${API}/nlp/index/push`, data, authHeaders())
+  axiosInstance.post('/nlp/index/push', data, authHeaders())
