@@ -39,4 +39,4 @@ def setup_metrics(app: FastAPI):
     @app.get("/TrhBVe_m5gg2002_E5WqiivSf4S", include_in_schema=False)
     def metrics():
         return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-    
+        

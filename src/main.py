@@ -16,6 +16,8 @@ from utils.mertics import setup_metrics
 
 app = FastAPI()
 
+
+
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
 app.add_middleware(CORSMiddleware,
@@ -26,7 +28,7 @@ app.add_middleware(CORSMiddleware,
 )
 
 
-
+setup_metrics(app)
 
 @app.on_event("startup")
 async def startup_span():
