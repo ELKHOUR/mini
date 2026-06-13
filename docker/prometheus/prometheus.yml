@@ -4,7 +4,7 @@ global:
 
 scrape_configs:
 
-  -job_name: 'fastapi'
+  - job_name: 'fastapi'
     static_configs:
       - targets: ['fastapi:8000']
     metrics_path: '/TrhBVe_m5gg2002_E5WqiivSf4S'
@@ -15,7 +15,7 @@ scrape_configs:
 
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090'] 
+      - targets: ['localhost:9090']
 
   - job_name: 'qdrant'
     static_configs:
