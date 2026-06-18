@@ -4,8 +4,9 @@ from routes.schemes.nlp import PushRequest, SearchRequest
 from models.ChunkModel import ChunkModel
 from controllers import NLPController
 from models import ResponseSignal
+from models.db_schemes import QueryLog
 from tqdm.auto import tqdm
-import logging
+import logging, time
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -104,11 +105,30 @@ async def answer_with_api_key(request: Request, search_request: SearchRequest):
         template_parser=request.app.template_parser,
     )
 
+    start_time = time.time()
+
     answer, full_prompt, chat_history = await nlp_controller.answer_rag_question(
         project=project,
         query=search_request.text,
         limit=search_request.limit
     )
+
+    response_time_ms = (time.time() - start_time) * 1000
+    was_answered = bool(answer)
+
+    async with request.app.db_client() as session:
+        async with session.begin():
+            log = QueryLog(
+                project_id=project.project_id,
+                query_text=search_request.text,
+                was_answered=was_answered,
+                response_time_ms=response_time_ms,
+                latitude=search_request.latitude,
+                longitude=search_request.longitude,
+                country=search_request.country,
+                city=search_request.city,
+            )
+            session.add(log)
 
     if not answer:
         return JSONResponse(

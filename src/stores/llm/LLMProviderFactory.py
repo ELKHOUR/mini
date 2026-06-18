@@ -1,5 +1,5 @@
 from .LLMEnums import LLMEnums
-from .providers import OpenAIProvider, CoHereProvider, DeepSeekProvider
+from .providers import OpenAIProvider, CoHereProvider, DeepSeekProvider, GigaChatProvider
 
 class LLMProviderFactory:
     def __init__(self, config: dict):
@@ -29,6 +29,18 @@ class LLMProviderFactory:
                 default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
                 default_generation_max_output_tokens=self.config.GENERATION_DEFAULT_MAX_TOKENS,
                 default_generation_temperature=self.config.GENERATION_DEFAULT_TEMPERATURE
+            )
+
+        if provider == LLMEnums.GIGACHAT.value:
+            return GigaChatProvider(
+                api_key=self.config.GIGACHAT_API_KEY,
+                token_url=self.config.GIGACHAT_TOKEN_URL,
+                base_url=self.config.GIGACHAT_BASE_URL,
+                scope=self.config.GIGACHAT_SCOPE,
+                default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
+                default_generation_max_output_tokens=self.config.GENERATION_DEFAULT_MAX_TOKENS,
+                default_generation_temperature=self.config.GENERATION_DEFAULT_TEMPERATURE,
+                verify_ssl=self.config.GIGACHAT_VERIFY_SSL,
             )
 
         return None

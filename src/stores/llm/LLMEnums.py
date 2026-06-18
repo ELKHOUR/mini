@@ -5,6 +5,8 @@ class LLMEnums(Enum):
     OPENAI = "OPENAI"
     COHERE = "COHERE"
     DEEPSEEK = "DEEPSEEK"
+    GIGACHAT = "GIGACHAT"
+
     
 class OpenAIEnums(Enum):
     SYSTEM = "system"

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import base, data, nlp, auth, project  
+from routes import base, data, nlp, auth, project, analytics  
 from helpers.config import get_settings
 from stores.llm.LLMProviderFactory import LLMProviderFactory
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
@@ -55,8 +55,6 @@ async def startup_span():
 
 
 
-
-
     # embedding client
     app.embedding_client = llm_provider_factory.create(provider=settings.EMBEDDING_BACKEND)
 
@@ -109,6 +107,7 @@ app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
 app.include_router(auth.auth_router)
 app.include_router(project.project_router) 
+app.include_router(analytics.analytics_router)
 
 
 

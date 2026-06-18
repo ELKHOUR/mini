@@ -30,6 +30,12 @@ class Settings(BaseSettings):
 
     DEEPSEEK_API_KEY: str = None
 
+    GIGACHAT_API_KEY: str = None
+    GIGACHAT_VERIFY_SSL: bool = True
+    GIGACHAT_TOKEN_URL: str = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+    GIGACHAT_BASE_URL: str = "https://gigachat.devices.sberbank.ru/api/v1"
+    GIGACHAT_SCOPE: str = "GIGACHAT_API_PERS"
+
     GENERATION_MODEL_ID_LITERAL : List[str] = None
     GENERATION_MODEL_ID : str = None
     EMBEDDING_MODEL_ID : str = None
